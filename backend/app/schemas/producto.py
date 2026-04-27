@@ -1,4 +1,5 @@
 from typing import Optional, List
+from datetime import datetime
 from pydantic import BaseModel, Field
 from app.schemas.categoria import CategoriaResponse
 
@@ -39,6 +40,8 @@ class ProductoListItem(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
     precio: float
+    created_at: datetime
+    updated_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
 
@@ -49,5 +52,7 @@ class ProductoResponse(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
     precio: float
+    created_at: datetime
+    updated_at: Optional[datetime] = None
     categorias: List[CategoriaResponse] = []
     ingredientes: List[IngredienteDeProductoResponse] = []

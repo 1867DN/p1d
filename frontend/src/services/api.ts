@@ -12,15 +12,49 @@ import type {
 const BASE = "http://localhost:8000";
 
 // ─── helpers ─────────────────────────────────────────────
+const fieldLabels: Record<string, string> = {
+  nombre: "Nombre",
+  precio: "Precio",
+  descripcion: "Descripción",
+  unidad_medida: "Unidad de medida",
+  categoria_ids: "Categorías",
+  ingredientes: "Ingredientes",
+};
+
+function parsePydanticMsg(msg: string): string {
+  if (/at least \d+ character/.test(msg)) {
+    const n = msg.match(/(\d+) character/)?.[1] ?? "2";
+    return `Debe tener al menos ${n} caracteres`;
+  }
+  if (/greater than 0/.test(msg)) return "Debe ser mayor a 0";
+  if (/greater than or equal to 0/.test(msg)) return "Debe ser mayor o igual a 0";
+  if (/less than or equal to/.test(msg)) {
+    const n = msg.match(/to ([\d.]+)/)?.[1] ?? "";
+    return `Debe ser menor o igual a ${n}`;
+  }
+  if (/field required/i.test(msg)) return "Campo requerido";
+  return msg;
+}
+
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const body = await res.json().catch(() => null);
-    const msg =
-      body?.detail ??
-      (Array.isArray(body?.detail)
-        ? body.detail.map((d: { msg: string }) => d.msg).join(", ")
-        : `Error ${res.status}`);
-    throw new Error(typeof msg === "string" ? msg : JSON.stringify(msg));
+    let msg: string;
+    if (Array.isArray(body?.detail)) {
+      msg = body.detail
+        .map((d: { loc: string[]; msg: string }) => {
+          const field = d.loc?.[d.loc.length - 1];
+          const label = field && field !== "body" ? (fieldLabels[field] ?? field) : null;
+          const translated = parsePydanticMsg(d.msg);
+          return label ? `${label}: ${translated}` : translated;
+        })
+        .join("\n");
+    } else if (typeof body?.detail === "string") {
+      msg = body.detail;
+    } else {
+      msg = `Error ${res.status}`;
+    }
+    throw new Error(msg);
   }
   if (res.status === 204) return undefined as T;
   return res.json();

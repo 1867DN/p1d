@@ -101,7 +101,7 @@ export default function ProductosPage() {
     setError("");
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
 
@@ -313,8 +313,15 @@ export default function ProductosPage() {
       >
         <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
-            <div className="bg-danger-50 border border-danger-100 text-danger-600 text-sm px-4 py-3 rounded-xl flex items-center gap-2">
-              <span>⚠️</span> {error}
+            <div className="bg-danger-50 border border-danger-100 text-danger-700 text-sm px-4 py-3 rounded-xl">
+              <div className="flex items-start gap-2">
+                <span className="mt-0.5 shrink-0">⚠️</span>
+                <ul className="space-y-1">
+                  {error.split("\n").map((msg, i) => (
+                    <li key={i}>{msg}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           )}
 
