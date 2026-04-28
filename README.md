@@ -6,7 +6,7 @@ Sistema de gestión de productos gastronómicos con categorías e ingredientes. 
 
 ## Video de Presentación
 
-> **Link al video:** *(pendiente de subir a YouTube)*
+> **Link al video:** [https://www.youtube.com/watch?v=pc7Yp6V-ziM](https://www.youtube.com/watch?v=pc7Yp6V-ziM)
 
 ---
 
